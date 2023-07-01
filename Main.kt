@@ -1,5 +1,8 @@
 package search
 
 fun main() {
-    println("Hello, World!")
+    val words = readln().trim().split(Regex(" +"))
+    val searchWord = readln()
+    val foundIndex = words.indexOf(searchWord) + 1
+    println(if (foundIndex < 1) "Not found" else foundIndex)
 }
