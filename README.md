@@ -1,65 +1,36 @@
-# Stage 3/6: User menu
+# Stage 4/6: X-files
 ## Description
-Let's modify the previously written search program an add a user menu for a better user experience.
+Now, let's further modify the program and teach it to read the input data from a file.
 
-## Objectives
-In this stage, you need to create a menu. The menu should display the following options:
+Objectives
+In this stage, your program should read data from a text file instead of the standard input. The file structure will depend on your text data type (personal information, address information, book information, and so on). See an example below:
 ```
-1. Search information.
-2. Print all data.
-0. Exit.
-```
-
-The user must select a menu item and then enter data if necessary. Your program must not stop until the corresponding option (exit) is chosen.
-
-When the user selects the option to search for a person, your program should now only take and search for one query at a time.
-
-Decompose the program into separate methods to make it easy to understand and to further develop or edit.
-
-## Example
-In the example below, we use people's names and emails as a dataset example. The lines that start with `>` represent the user input. Note that these symbols are not part of the input.
-```
-Enter the number of people:
-> 6
-Enter all people:
-> Dwight Joseph djo@gmail.com
-> Rene Webb webb@gmail.com
-> Katie Jacobs
-> Erick Harrington harrington@gmail.com
-> Myrtle Medina
-> Erick Burgess
-
-=== Menu ===
-1. Find a person
-2. Print all people
-0. Exit
-> 3
-
-Incorrect option! Try again.
-
-=== Menu ===
-1. Find a person
-2. Print all people
-0. Exit
-> 1
-
-Enter a name or email to search all suitable people.
-> KATIE
-Katie Jacobs
-
-=== Menu ===
-1. Find a person
-2. Print all people
-0. Exit
-> 2
-
-=== List of people ===
 Dwight Joseph djo@gmail.com
 Rene Webb webb@gmail.com
 Katie Jacobs
 Erick Harrington harrington@gmail.com
 Myrtle Medina
 Erick Burgess
+```
+
+The program must process the command line argument `--data` followed by the name of the file with the data, for example, `--data text.txt`.
+
+Note that the file should not include the total number of lines. All lines must be read only once, at the start of your program.
+
+## Example
+Here is an example of an output line, which contains three items: the first name, the last name, and an email address.
+
+The lines that start with `>` represent the user input. Note that these symbols are not part of the input.
+```
+=== Menu ===
+1. Find a person
+2. Print all people
+0. Exit
+> 1
+
+Enter a name or email to search all matching people.
+> WEBB@gmail.com
+Rene Webb webb@gmail.com
 
 === Menu ===
 1. Find a person

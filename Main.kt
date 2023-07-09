@@ -1,11 +1,9 @@
 package search
 
-fun main() {
-    println("Enter the number of people:")
-    val numberOfPeople = readln().toInt()
-    println("Enter all people:")
-    val people = List(numberOfPeople) { readln() }
+import java.io.File
 
+fun main(args: Array<String>) {
+    val people = getPeople(args)
     var exit = false
     while (!exit) {
         printMenu()
@@ -49,3 +47,13 @@ private fun printMenu() {
         0. Exit
     """.trimIndent())
 }
+
+private fun getPeople(args: Array<String>): List<String> {
+    val people = mutableListOf<String>()
+    val index = args.indexOf("--data")
+    if (index >= 0 && args.size > index + 1) {
+        File(args[index + 1]).forEachLine { people.add(it) }
+    }
+    return people
+}
+
