@@ -6,21 +6,46 @@ fun main() {
     println("Enter all people:")
     val people = List(numberOfPeople) { readln() }
 
-    println("Enter the number of search queries:")
-    val numberOfSearchQueries = readln().toInt()
-
-    for (i in 1..numberOfSearchQueries) {
-        println("Enter data to search people:")
-        val data = readln()
-
-        val foundPeople = people.filter { it.lowercase().matches(Regex(".*" + data.lowercase() + ".*")) }
-
-        if (foundPeople.isEmpty()) {
-            println("No matching people found.")
-        } else {
-            println("People found:")
-            println(foundPeople.joinToString("\n"))
+    var exit = false
+    while (!exit) {
+        printMenu()
+        while (true) {
+            try {
+                when (Options.getOption(readln().toInt())) {
+                    Options.FIND -> findPerson(people)
+                    Options.PRINT -> printAllPeople(people)
+                    Options.EXIT -> exit = true
+                }
+                break
+            } catch (e: RuntimeException) {
+                println("Incorrect option! Try again.")
+            }
         }
-
     }
+    println("Bye!")
+}
+
+private fun printAllPeople(people: List<String>) {
+    println("=== List of people ===")
+    println(people.joinToString("\n"))
+}
+
+private fun  findPerson(people: List<String>) {
+    println("Enter a name or email to search all suitable people.")
+    val data = readln()
+    val foundPeople = people.filter { it.lowercase().matches(Regex(".*" + data.lowercase() + ".*")) }
+    if (foundPeople.isEmpty()) {
+        println("No matching people found.")
+    } else {
+        println(foundPeople.joinToString("\n"))
+    }
+}
+
+private fun printMenu() {
+    println("""
+        === Menu ===
+        1. Find a person
+        2. Print all people
+        0. Exit
+    """.trimIndent())
 }
