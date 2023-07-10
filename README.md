@@ -1,25 +1,37 @@
-# Stage 4/6: X-files
+# Stage 5/6: Inverted Index search
 ## Description
-Now, let's further modify the program and teach it to read the input data from a file.
+Now your program can successfully search for all matching lines, and the search is case- and space-insensitive. There is one problem though: you need to check each line to find out whether it contains the query string.
 
-Objectives
-In this stage, your program should read data from a text file instead of the standard input. The file structure will depend on your text data type (personal information, address information, book information, and so on). See an example below:
+To optimize your program, you can use a data structure called an Inverted Index. It maps each word to all positions/lines/documents in which the word occurs. As a result, when we receive a query, we can immediately find the answer without any comparisons.
+
+## Objectives
+In this stage, build an inverted index at the start of the program and then use the index for searching operations. You can implement it using the Map class. It connects an item with a list (or set) of indexes belonging to the lines that contain the item.
+
+Suppose you have the following list of lines:
 ```
-Dwight Joseph djo@gmail.com
-Rene Webb webb@gmail.com
-Katie Jacobs
-Erick Harrington harrington@gmail.com
-Myrtle Medina
-Erick Burgess
+0: Katie Jacobs
+1: Erick Harrington harrington@gmail.com
+2: Myrtle Medina
+3: Erick Burgess
 ```
 
-The program must process the command line argument `--data` followed by the name of the file with the data, for example, `--data text.txt`.
+For these lines, the inverted index will look like this:
+```
+Katie -> [0]
+Jacobs -> [0]
+Erick -> [1, 3]
+Harrington -> [1]
+harrington@gmail.com -> [1]
+Myrtle -> [2]
+Medina -> [2]
+Burgess -> [3]
+```
 
-Note that the file should not include the total number of lines. All lines must be read only once, at the start of your program.
+The order of pairs is not important. If you are searching for Erick, you can immediately get the target fields using this mapping.
+
+Note that the Inverted Index is not intended to search for parts of a word, it is only used to search for full words.
 
 ## Example
-Here is an example of an output line, which contains three items: the first name, the last name, and an email address.
-
 The lines that start with `>` represent the user input. Note that these symbols are not part of the input.
 ```
 === Menu ===
@@ -29,8 +41,31 @@ The lines that start with `>` represent the user input. Note that these symbols 
 > 1
 
 Enter a name or email to search all matching people.
-> WEBB@gmail.com
-Rene Webb webb@gmail.com
+> ERICK
+2 persons found:
+Erick Harrington harrington@gmail.com
+Erick Burgess
+
+=== Menu ===
+1. Find a person
+2. Print all people
+0. Exit
+> 1
+
+Enter a name or email to search all matching people.
+> ROY@gmail.com
+1 person found:
+Richard    Roy    roy@gmail.com
+
+=== Menu ===
+1. Find a person
+2. Print all people
+0. Exit
+> 1
+
+Enter a name or email to search all matching people.
+> john
+No matching people found.
 
 === Menu ===
 1. Find a person
