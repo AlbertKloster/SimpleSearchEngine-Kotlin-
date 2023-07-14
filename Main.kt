@@ -2,17 +2,20 @@ package search
 
 import java.io.File
 
+val people = mutableListOf<String>()
+val invertedIndexMap = mutableMapOf<String, MutableSet<Int>>()
+
 fun main(args: Array<String>) {
-    val people = getPeople(args)
-    val invertedIndexMap = getInvertedIndexMap(people)
+    setPeople(args)
+    setInvertedIndexMap(people)
     var exit = false
     while (!exit) {
         printMenu()
         while (true) {
             try {
                 when (Options.getOption(readln().toInt())) {
-                    Options.FIND -> findPerson(people, invertedIndexMap)
-                    Options.PRINT -> printAllPeople(people)
+                    Options.FIND -> findPerson()
+                    Options.PRINT -> printAllPeople()
                     Options.EXIT -> exit = true
                 }
                 break
@@ -24,58 +27,106 @@ fun main(args: Array<String>) {
     println("Bye!")
 }
 
-private fun printAllPeople(people: List<String>) {
+private fun printAllPeople() {
     println("=== List of people ===")
     println(people.joinToString("\n"))
 }
 
-private fun  findPerson(people: List<String>, invertedIndexMap: Map<String, List<Int>>) {
+private fun findPerson() {
+
+    println("Select a matching strategy: ALL, ANY, NONE")
+    val strategy = Strategies.getStrategy(readln())
+
     println("Enter a name or email to search all suitable people.")
     val data = readln().trim().lowercase()
 
-    val indices = invertedIndexMap[data]
+    val matchingPeople = when (strategy) {
+        Strategies.ALL -> findAll(data)
+        Strategies.ANY -> findAny(data)
+        Strategies.NONE -> findNone(data)
+    }
 
-    if (indices == null) {
+    if (matchingPeople.isEmpty()) {
         println("No matching people found.")
     } else {
-        indices.forEach { println(people[it]) }
+        matchingPeople.forEach { println(it) }
     }
 }
 
+private fun findAll(data: String): Set<String> {
+    var indices = emptySet<Int>()
+    val foundPeople = mutableSetOf<String>()
+    data.trim().split(Regex("\\s+")).forEach {
+        val foundIndices = invertedIndexMap[it.lowercase()]
+        if (foundIndices != null) {
+            indices = if (indices.isEmpty()) foundIndices else indices intersect foundIndices
+        }
+    }
+    indices.forEach {
+        foundPeople.add(people[it])
+    }
+    return foundPeople
+}
+
+private fun findAny(data: String): Set<String> {
+    val foundPeople = mutableSetOf<String>()
+    getIndicesAny(data).forEach {
+        foundPeople.add(people[it])
+    }
+    return foundPeople
+}
+
+private fun findNone(data: String): Set<String> {
+    val indicesAny = getIndicesAny(data)
+    val foundPeople = mutableSetOf<String>()
+    for (index in people.indices) {
+        if (!indicesAny.contains(index))
+            foundPeople.add(people[index])
+    }
+    return foundPeople
+}
+
+private fun getIndicesAny(data: String): Set<Int> {
+    val indicesAny = mutableSetOf<Int>()
+    data.trim().split(Regex("\\s+")).forEach {
+        val foundIndices = invertedIndexMap[it.lowercase()]
+        if (foundIndices != null)
+            indicesAny.addAll(foundIndices)
+    }
+    return indicesAny
+}
+
+
 private fun printMenu() {
-    println("""
+    println(
+        """
         === Menu ===
         1. Find a person
         2. Print all people
         0. Exit
-    """.trimIndent())
+    """.trimIndent()
+    )
 }
 
-private fun getPeople(args: Array<String>): List<String> {
-    val people = mutableListOf<String>()
+private fun setPeople(args: Array<String>) {
     val index = args.indexOf("--data")
     if (index >= 0 && args.size > index + 1) {
         File(args[index + 1]).forEachLine { people.add(it) }
     }
-    return people
 }
 
-private fun getInvertedIndexMap(people: List<String>): Map<String, List<Int>> {
-    val invertedIndexMap = mutableMapOf<String, MutableList<Int>>()
+private fun setInvertedIndexMap(people: List<String>) {
     for (index in people.indices) {
         val parts = people[index].split(Regex("\\s+"))
         parts.forEach {
             val indices = invertedIndexMap[it.lowercase()]
             if (indices == null) {
-                invertedIndexMap[it.lowercase()] = mutableListOf(index)
+                invertedIndexMap[it.lowercase()] = mutableSetOf(index)
             } else {
-                if (!indices.contains(index)) {
-                    indices.add(index)
-                    invertedIndexMap[it.lowercase()] = indices
-                }
+                indices.add(index)
+                invertedIndexMap[it.lowercase()] = indices
             }
         }
     }
-    return invertedIndexMap
 }
 
